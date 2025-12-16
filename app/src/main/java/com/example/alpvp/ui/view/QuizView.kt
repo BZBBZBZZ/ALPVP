@@ -27,6 +27,8 @@ fun QuizView(
     val state = viewModel.quizState
     val resultState = viewModel.resultState
 
+
+
     // Cek jika result sudah sukses, pindah halaman
     androidx.compose.runtime.LaunchedEffect(resultState) {
         if (resultState is ResultUiState.Success && !viewModel.hasNavigatedToResult) {

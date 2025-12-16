@@ -120,7 +120,7 @@ fun ResultView(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        items(result.details) { detail ->
+                        items(result.details ?: emptyList()) { detail ->
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = Color.White),
                                 shape = RoundedCornerShape(12.dp),

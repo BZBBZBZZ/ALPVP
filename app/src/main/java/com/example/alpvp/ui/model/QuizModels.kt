@@ -34,7 +34,7 @@ data class QuizResultResponse(
     val total_questions: Int,
     val correct_count: Int,
     val score: Int,
-    val details: List<ResultDetail>
+    val details: List<ResultDetail>? = null
 ) : Parcelable
 
 @Parcelize
