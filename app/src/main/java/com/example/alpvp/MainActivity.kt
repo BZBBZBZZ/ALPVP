@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.alpvp.ui.theme.ALPVPTheme
 import com.example.alpvp.ui.route.AppRouting
+import androidx.compose.material3.Surface
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ALPVPTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
+                    Surface(modifier = Modifier.fillMaxSize()) {
                     AppRouting()
 
                 }
