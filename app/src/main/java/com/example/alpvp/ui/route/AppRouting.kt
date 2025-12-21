@@ -12,7 +12,6 @@ import com.example.alpvp.ui.viewmodel.QuizViewModel
 @Composable
 fun AppRouting() {
     val navController = rememberNavController()
-    // Kita pakai 1 ViewModel instance untuk dibagi antar screen agar datanya nyambung
     val quizViewModel: QuizViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "Quiz") {

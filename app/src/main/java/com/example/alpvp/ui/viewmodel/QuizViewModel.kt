@@ -15,7 +15,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class QuizViewModel : ViewModel() {
-    // Inisialisasi Repository
     private val repository = AppContainer().quizRepository
 
     // State Halaman Main
@@ -44,10 +43,10 @@ class QuizViewModel : ViewModel() {
     }
 
     fun loadQuestions() {
-        viewModelScope.launch {
+        viewModelScope.launch { //buat manggil API di background thread
             quizState = QuizUiState.Loading
             try {
-                val response = repository.getAllQuestions()
+                val response = repository.getAllQuestions() //buat get /api/questions
                 if (response.isSuccessful && response.body() != null) {
                     val questions = response.body()!!.data
                     quizState = QuizUiState.Success(questions = questions)
@@ -89,23 +88,23 @@ class QuizViewModel : ViewModel() {
     fun answerQuestion(answer: String) {
         val currentState = quizState
         if (currentState is QuizUiState.Success) {
-            // 1. Simpan jawaban
+            // nyimpen jawaban
             val currentQ = currentState.questions[currentState.currentQuestionIndex]
             currentState.userAnswers[currentQ.id] = answer
 
-            // 2. Cek apakah masih ada soal berikutnya
+            // cek ada soal lain nya g
             if (currentState.currentQuestionIndex < currentState.questions.size - 1) {
-                // Lanjut soal berikutnya, reset timer
+                // lanjut next soal, reset timer
                 quizState = currentState.copy(
                     currentQuestionIndex = currentState.currentQuestionIndex + 1,
-                    timeLeft = 10 // Reset timer ke 10 detik
+                    timeLeft = 10 // reset timer ke 10 detik
                 )
                 startTimer()
-                // Timer akan otomatis lanjut karena masih dalam state Success
+                // timer akan otomatis lanjut karena masih dalam state Success
             } else {
-                // Soal habis, Submit ke server
+                // soal abis, submit keserver
                 timerJob?.cancel()
-                // Set state ke Loading agar timer loop berhenti
+                // nge set state ke loading buat timer stop
                 resultState = ResultUiState.Loading
                 submitQuiz(currentState)
             }
@@ -114,10 +113,8 @@ class QuizViewModel : ViewModel() {
 
     private fun submitQuiz(finalState: QuizUiState.Success) {
         viewModelScope.launch {
-            // Pindah ke UI Result Loading dulu
-            // (Note: logic navigasi nanti diatur di View berdasarkan state result)
 
-            // Konversi jawaban map ke list request
+            // convert jawaban map ke list request
             val answerList = finalState.userAnswers.map {
                 UserAnswerRequest(it.key, it.value)
             }

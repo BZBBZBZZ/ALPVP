@@ -3,8 +3,8 @@ package com.example.alpvp.ui.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-// Retrofit
-// GET Questions
+
+// get question
 data class QuestionWrapper(
     val data: List<QuestionResponse>
 )
@@ -18,7 +18,7 @@ data class QuestionResponse(
     val option_d: String
 )
 
-// POST Submit
+// post submit
 data class SubmitQuizRequest(
     val answers: List<UserAnswerRequest>
 )
@@ -28,7 +28,6 @@ data class UserAnswerRequest(
     val answer: String
 )
 
-// Response Result
 @Parcelize
 data class QuizResultResponse(
     val total_questions: Int,
@@ -44,7 +43,4 @@ data class ResultDetail(
     val correct_answer: String? = null,
     val is_correct: Boolean,
     val explanation: String? = null,
-    // Kita butuh teks soal di result page, tapi response backend kamu mungkin belum ada teks soal di 'details'.
-    // Nanti kita akali di ViewModel atau kamu update backend.
-    // Untuk sekarang asumsi 'explanation' sudah cukup panjang.
 ) : Parcelable

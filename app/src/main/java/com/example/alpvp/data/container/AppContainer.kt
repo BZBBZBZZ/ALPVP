@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class AppContainer {
     companion object {
-        // Ganti localhost dengan 10.0.2.2 untuk Emulator Android
+        // ganti localhost pake 10.0.2.2 buat emulator, tapi g pake
         private const val BASE_URL = "http://10.0.2.2:3000/"
     }
 
@@ -19,7 +19,7 @@ class AppContainer {
         .build()
 
     private val retrofitService: QuizService by lazy {
-        retrofit.create(QuizService::class.java)
+        retrofit.create(QuizService::class.java) //di create ama retrofit
     }
 
     val quizRepository: QuizRepository by lazy {
