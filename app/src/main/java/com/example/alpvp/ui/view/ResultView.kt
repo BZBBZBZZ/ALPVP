@@ -3,7 +3,7 @@ package com.example.alpvp.ui.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -23,22 +23,19 @@ fun ResultView(
     viewModel: QuizViewModel,
     navController: NavController
 ) {
-    // Ambil state hasil dari ViewModel
     val state = viewModel.resultState
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F6FA)) // Background abu-abu muda
+            .background(Color(0xFFF5F6FA))
             .padding(16.dp)
     ) {
         when (state) {
-            // 1. Tampilan Loading
             is ResultUiState.Loading -> {
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
 
-            // 2. Tampilan Error
             is ResultUiState.Error -> {
                 Text(
                     text = "Error: ${state.message}",
@@ -47,7 +44,6 @@ fun ResultView(
                 )
             }
 
-            // 3. Tampilan Sukses (Hasil Kuis)
             is ResultUiState.Success -> {
                 val result = state.result
 
@@ -64,7 +60,7 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Ikon Medali (Lingkaran Merah)
+                    // Ikon Medali
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -105,22 +101,24 @@ fun ResultView(
                                 text = "${result.score}",
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF6200EE) // Warna Ungu
+                                color = Color(0xFF6200EE)
                             )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // List Pembahasan Soal (LazyColumn)
-                    // Modifier.weight(1f) agar list mengambil sisa ruang yang ada
+                    // List Pembahasan Soal
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        // Tambahkan padding bawah agar item terakhir tidak tertutup tombol
+                        contentPadding = PaddingValues(bottom = 16.dp)
                     ) {
-                        items(result.details ?: emptyList()) { detail ->
+                        // Gunakan itemsIndexed untuk mendapatkan nomor soal
+                        itemsIndexed(result.details ?: emptyList()) { index, detail ->
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = Color.White),
                                 shape = RoundedCornerShape(12.dp),
@@ -128,36 +126,39 @@ fun ResultView(
                                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-
-                                    // Status Benar/Salah
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            text = if (detail.is_correct) "✅ Benar" else "❌ Salah",
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (detail.is_correct) Color(0xFF4CAF50) else Color.Red
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(4.dp))
-
-                                    // Jawaban User (Diberi pengaman ?:)
-                                    Text(text = "Jawaban kamu: ${detail.user_answer ?: "-"}")
-
-                                    // Kunci Jawaban (Diberi pengaman ?:)
+                                    // 1. Nomor dan Teks Soal
+                                    // Menggunakan teks placeholder jika data dari backend belum ada
+                                    val questionText = detail.question_text ?: "(Soal tidak tersedia)"
                                     Text(
-                                        text = "Kunci: ${detail.correct_answer ?: "-"}",
-                                        fontWeight = FontWeight.Bold
+                                        text = "${index + 1}. $questionText",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp
                                     )
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    // Penjelasan (ANTI CRASH: Menggunakan Elvis Operator)
-                                    // Jika explanation null, tampilkan "Tidak ada pembahasan"
+                                    // 2. Status Benar/Salah
                                     Text(
-                                        text = detail.explanation ?: "Tidak ada pembahasan.",
-                                        fontSize = 12.sp,
-                                        color = Color.Gray,
-                                        lineHeight = 14.sp
+                                        text = if (detail.is_correct) "Benar" else "Salah",
+                                        color = if (detail.is_correct) Color(0xFF4CAF50) else Color.Red,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                    // 3. Jawaban Benar
+                                    val correctAnswer = detail.correct_answer ?: "-"
+                                    Text(
+                                        text = "jawaban yang benar adalah ($correctAnswer)",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+
+                                    Spacer(modifier = Modifier.height(4.dp))
+
+                                    // 4. Penjelasan (Explanation)
+                                    val explanation = detail.explanation ?: "Tidak ada pembahasan."
+                                    Text(
+                                        text = "($explanation)",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.Gray
                                     )
                                 }
                             }
@@ -168,7 +169,7 @@ fun ResultView(
 
                     // Tombol Leaderboard (Hiasan)
                     Button(
-                        onClick = { /* TODO: Arahkan ke Leaderboard */ },
+                        onClick = { /* TODO */ },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE94057)),
                         shape = RoundedCornerShape(50),
                         modifier = Modifier.fillMaxWidth()
@@ -176,16 +177,13 @@ fun ResultView(
                         Text("Leaderboard")
                     }
 
-                    // Tombol Kembali ke Beranda (Reset Quiz)
+                    // Tombol Kembali ke Beranda
                     OutlinedButton(
                         onClick = {
                             viewModel.resetNavigationFlag()
-                            // Navigasi kembali ke halaman Quiz (Restart)
                             navController.navigate("Quiz") {
-                                // Hapus history Result agar tidak bisa diback balik kesini
                                 popUpTo("Result") { inclusive = true }
                             }
-                            // Reset state di ViewModel agar mulai dari awal lagi
                             viewModel.loadQuestions()
                         },
                         shape = RoundedCornerShape(50),

@@ -123,6 +123,7 @@ class QuizViewModel : ViewModel() {
             try {
                 val response = repository.submitQuiz(request)
                 if (response.isSuccessful && response.body() != null) {
+
                     resultState = ResultUiState.Success(response.body()!!)
                 } else {
                     resultState = ResultUiState.Error("Gagal submit jawaban")

@@ -144,10 +144,10 @@ fun QuizView(
 
                     // Options Buttons
                     val options = listOf(
-                        "a" to currentQ.option_a,
-                        "b" to currentQ.option_b,
-                        "c" to currentQ.option_c,
-                        "d" to currentQ.option_d
+                        "A" to currentQ.option_a,
+                        "B" to currentQ.option_b,
+                        "C" to currentQ.option_c,
+                        "D" to currentQ.option_d
                     )
 
                     options.forEach { (key, text) ->
