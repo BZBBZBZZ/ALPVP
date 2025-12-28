@@ -23,69 +23,109 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.alpvp.ui.uistate.HomeUIState
 import com.example.alpvp.ui.viewmodel.HomeViewModel
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 @Composable
 fun HomeView(
     viewModel: HomeViewModel,
     navController: NavController
 ) {
     val state = viewModel.homeUIState
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F6FA))
-            .padding(16.dp)
-    ) {
-        // header atas
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp, top = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "🥗 ", fontSize = 20.sp)
-                Text(
-                    text = "Healthy Quiz",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF9C27B0)
+    Scaffold(
+        bottomBar = {
+            NavigationBar(
+                containerColor = Color.White,
+                tonalElevation = 8.dp
+            ) {
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") },
+                    selected = true,
+                    onClick = { }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Favorite, contentDescription = "Favorites") },
+                    label = { Text("Favorites") },
+                    selected = false,
+                    onClick = { }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") },
+                    selected = false,
+                    onClick = { }
                 )
             }
-            Text(
-                text = "Makanan Sehat",
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
         }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF5F6FA))
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            // header atas
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp, top = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "🥗 ", fontSize = 20.sp)
+                    Text(
+                        text = "Healthy Quiz",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF9C27B0)
+                    )
+                }
+                Text(
+                    text = "Makanan Sehat",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+            }
 
-        // grid kard
-        when (state) {
-            is HomeUIState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-            is HomeUIState.Error -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(state.message) }
-            is HomeUIState.Success -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(state.foods) { food ->
-                        FoodCard(
-                            name = food.name,
-                            category = food.category,
-                            imageUrl = food.image_url,
-                            onClick = { navController.navigate("detail/${food.id}") }
-                        )
+            // grid kard
+            when (state) {
+                is HomeUIState.Loading -> Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
+
+                is HomeUIState.Error -> Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { Text(state.message) }
+
+                is HomeUIState.Success -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(state.foods) { food ->
+                            FoodCard(
+                                name = food.name,
+                                category = food.category,
+                                imageUrl = food.image_url,
+                                onClick = { navController.navigate("detail/${food.id}") }
+                            )
+                        }
                     }
                 }
+
+                else -> {}
             }
-            else -> {}
         }
     }
 }
-
 @Composable
 fun FoodCard(name: String, category: String, imageUrl: String, onClick: () -> Unit) {
     Card(

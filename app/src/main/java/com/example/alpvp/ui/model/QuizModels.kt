@@ -40,11 +40,9 @@ data class QuizResultResponse(
 @Parcelize
 data class ResultDetail(
     val question_id: Int,
+    val question_text: String? = null,
     val user_answer: String? = null,
     val correct_answer: String? = null,
     val is_correct: Boolean,
-    val explanation: String? = null,
-    // Kita butuh teks soal di result page, tapi response backend kamu mungkin belum ada teks soal di 'details'.
-    // Nanti kita akali di ViewModel atau kamu update backend.
-    // Untuk sekarang asumsi 'explanation' sudah cukup panjang.
+    val explanation: String? = null
 ) : Parcelable
