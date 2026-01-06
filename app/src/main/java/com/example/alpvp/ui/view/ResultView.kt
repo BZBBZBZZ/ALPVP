@@ -12,12 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alpvp.ui.uistate.ResultUiState
 import com.example.alpvp.ui.viewmodel.QuizViewModel
+import androidx.compose.foundation.layout.WindowInsets // Pastikan import ini ada
+import androidx.compose.foundation.layout.statusBars // Pastikan import ini ada
+import androidx.compose.foundation.layout.windowInsetsPadding // Pastikan import ini ada
 
 @Composable
 fun ResultView(
@@ -26,10 +28,13 @@ fun ResultView(
 ) {
     val state = viewModel.resultState
 
+    // --- PERBAIKAN DI SINI (BOX UTAMA) ---
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F6FA))
+            // Tambahkan baris ini agar konten turun melewati status bar/kamera
+            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(16.dp)
     ) {
         when (state) {
@@ -106,8 +111,7 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 4. LIST PEMBAHASAN (INI YANG BARU)
-                    // Menggunakan weight(1f) agar mengambil sisa ruang yang ada sebelum tombol
+                    // 4. LIST PEMBAHASAN
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
@@ -115,7 +119,6 @@ fun ResultView(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         contentPadding = PaddingValues(bottom = 10.dp)
                     ) {
-                        // Gunakan itemsIndexed agar dapat nomor urut (index)
                         itemsIndexed(result.details ?: emptyList()) { index, detail ->
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -126,7 +129,6 @@ fun ResultView(
                                 Column(modifier = Modifier.padding(16.dp)) {
 
                                     // Nomor dan Teks Soal
-                                    // Jika backend belum kirim teks soal, pakai placeholder dulu
                                     val teksSoal = detail.question_text ?: "Soal No. ${index + 1}"
                                     Text(
                                         text = "${index + 1}. $teksSoal",
