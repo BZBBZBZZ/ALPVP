@@ -43,21 +43,28 @@ fun HomeView(
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
+                    selected = false,
+                    onClick = { }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.PlayArrow, contentDescription = "Quiz") },
+                    label = { Text("Quiz") },
+                    selected = false,
+                    onClick = { navController.navigate("Quiz")}
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.List, contentDescription = "Materi") },
+                    label = { Text("Materi") },
                     selected = true,
                     onClick = { }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Favorite, contentDescription = "Favorites") },
-                    label = { Text("Favorites") },
+                    icon = { Icon(Icons.Default.Star, contentDescription = "Leaderboard") },
+                    label = { Text("Leaderboard") },
                     selected = false,
-                    onClick = { }
+                    onClick = {  }
                 )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
-                    selected = false,
-                    onClick = { }
-                )
+
             }
         }
     ) { paddingValues ->
@@ -108,9 +115,10 @@ fun HomeView(
                         columns = GridCells.Fixed(2),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(bottom = 16.dp)
+                        contentPadding = PaddingValues(bottom = 16.dp),
+                        modifier = Modifier.weight(1f)
                     ) {
-                        items(state.foods) { food ->
+                        items(state.foods.distinctBy { it.id }) { food ->
                             FoodCard(
                                 name = food.name,
                                 category = food.category,
@@ -149,7 +157,8 @@ fun FoodCard(name: String, category: String, imageUrl: String, onClick: () -> Un
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.LightGray),
                 contentScale = ContentScale.Crop
             )
 
