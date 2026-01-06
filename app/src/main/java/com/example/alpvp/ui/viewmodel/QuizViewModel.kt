@@ -113,7 +113,6 @@ class QuizViewModel : ViewModel() {
 
     private fun submitQuiz(finalState: QuizUiState.Success) {
         viewModelScope.launch {
-
             // convert jawaban map ke list request
             val answerList = finalState.userAnswers.map {
                 UserAnswerRequest(it.key, it.value)
@@ -121,12 +120,22 @@ class QuizViewModel : ViewModel() {
             val request = SubmitQuizRequest(answerList)
 
             try {
+                // Panggil Repository
                 val response = repository.submitQuiz(request)
+
+                // Cek apakah sukses dan body tidak null
                 if (response.isSuccessful && response.body() != null) {
 
-                    resultState = ResultUiState.Success(response.body()!!)
+                    // === PERBAIKAN DISINI ===
+                    // Kita BUKA WRAPPER-nya dulu untuk ambil isinya (.data)
+                    val wrapper = response.body()!!
+                    val realResult = wrapper.data
+
+                    // Masukkan data asli (realResult) ke state
+                    resultState = ResultUiState.Success(realResult)
+
                 } else {
-                    resultState = ResultUiState.Error("Gagal submit jawaban")
+                    resultState = ResultUiState.Error("Gagal submit: ${response.code()}")
                 }
             } catch (e: Exception) {
                 resultState = ResultUiState.Error(e.message ?: "Error koneksi")
