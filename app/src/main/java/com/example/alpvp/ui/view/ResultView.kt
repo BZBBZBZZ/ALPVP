@@ -197,9 +197,10 @@ fun ResultView(
                         }
                     }
 
-                    // 5. TOMBOL NAVIGASI BAWAH (SUDAH DIPERBAIKI)
+                    // 5. TOMBOL NAVIGASI
+
+                    // Tombol Leaderboard
                     Button(
-                        // Navigasi ke halaman Leaderboard
                         onClick = { navController.navigate("leaderboard") },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE94057)),
                         shape = RoundedCornerShape(50),
@@ -210,13 +211,37 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // --- TOMBOL MAIN LAGI (SUDAH DIPERBAIKI) ---
+                    Button(
+                        onClick = {
+                            // 1. Reset state & Load soal baru DULUAN
+                            viewModel.resetNavigationFlag()
+                            viewModel.loadQuestions()
+
+                            // 2. Baru pindah ke Quiz
+                            navController.navigate("Quiz") {
+                                // popUpTo("home") inclusive = false artinya:
+                                // Hapus history Result, tapi biarkan Home tetap ada di bawah
+                                popUpTo("home") { inclusive = false }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
+                        shape = RoundedCornerShape(50),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("🔄 Main Quiz Lagi")
+                    }
+                    // ---------------------------------
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Tombol Home
                     OutlinedButton(
                         onClick = {
                             viewModel.resetNavigationFlag()
                             navController.navigate("home") {
                                 popUpTo("home") { inclusive = true }
                             }
-                            viewModel.loadQuestions()
                         },
                         shape = RoundedCornerShape(50),
                         modifier = Modifier.fillMaxWidth()
