@@ -33,10 +33,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(
+    onRegisterSuccess: () -> Unit,
+    onNavigateToLogin: () -> Unit
+) {
     var fullName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -48,27 +52,14 @@ fun RegisterScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(136.dp)) // Placeholder for the logo
-        Text(
-            text = "Buat Akun Baru",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF333333)
-        )
-        Text(
-            text = "Daftar untuk memulai quiz",
-            fontSize = 16.sp,
-            color = Color(0xFF666666)
-        )
+        // ... (Kode UI Header dan TextField Nama tetap sama) ...
+        Spacer(modifier = Modifier.height(136.dp))
+        Text(text = "Buat Akun Baru", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333))
+        Text(text = "Daftar untuk memulai quiz", fontSize = 16.sp, color = Color(0xFF666666))
         Spacer(modifier = Modifier.height(32.dp))
-        Column(
-            modifier = Modifier.padding(horizontal = 40.dp)
-        ) {
-            Text(
-                text = "Nama Lengkap",
-                fontSize = 14.sp,
-                color = Color(0xFF666666)
-            )
+
+        Column(modifier = Modifier.padding(horizontal = 40.dp)) {
+            Text(text = "Nama Lengkap", fontSize = 14.sp, color = Color(0xFF666666))
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { fullName = it },
@@ -87,14 +78,10 @@ fun RegisterScreen() {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Column(
-            modifier = Modifier.padding(horizontal = 40.dp)
-        ) {
-            Text(
-                text = "Password",
-                fontSize = 14.sp,
-                color = Color(0xFF666666)
-            )
+
+        // ... (Kode TextField Password tetap sama) ...
+        Column(modifier = Modifier.padding(horizontal = 40.dp)) {
+            Text(text = "Password", fontSize = 14.sp, color = Color(0xFF666666))
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -103,7 +90,7 @@ fun RegisterScreen() {
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
-                    IconButton(onClick = {passwordVisible = !passwordVisible}){
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Text(if (passwordVisible) "Hide" else "Show")
                     }
                 },
@@ -118,28 +105,26 @@ fun RegisterScreen() {
             )
         }
 
-
         Spacer(modifier = Modifier.height(32.dp))
+
+        // --- UPDATE TOMBOL DAFTAR ---
         Button(
-            onClick = { /* Handle registration */ },
+            onClick = {
+                // Logika simpan data user disini
+                onRegisterSuccess()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
                 .height(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent
-            ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
                 text = "Daftar",
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(Color(0xFF8A2BE2), Color(0xFF4169E1))
-                        )
-                    )
+                    .background(brush = Brush.horizontalGradient(colors = listOf(Color(0xFF8A2BE2), Color(0xFF4169E1))))
                     .padding(12.dp),
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -147,12 +132,19 @@ fun RegisterScreen() {
                 fontWeight = FontWeight.Bold
             )
         }
+
         Spacer(modifier = Modifier.height(24.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+
+        // --- UPDATE LINK MASUK ---
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Sudah punya akun? ", fontSize = 14.sp, color = Color.Gray)
-            Text("Masuk sekarang", fontSize = 14.sp, color = Color(0xFF8A2BE2), fontWeight = FontWeight.Bold)
+            Text(
+                text = "Masuk sekarang",
+                fontSize = 14.sp,
+                color = Color(0xFF8A2BE2),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable { onNavigateToLogin() } // Tambahkan ini
+            )
         }
     }
 }
@@ -160,5 +152,5 @@ fun RegisterScreen() {
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen()
+    RegisterScreen(onRegisterSuccess = {}, onNavigateToLogin = {})
 }

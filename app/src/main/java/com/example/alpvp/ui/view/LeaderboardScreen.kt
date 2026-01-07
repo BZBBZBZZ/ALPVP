@@ -131,16 +131,8 @@ fun LeaderboardCard(rank: Int, user: User) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, heightDp = 800, widthDp = 400)
 @Composable
 fun LeaderboardScreenPreview() {
-    // We can create a dummy state for preview purposes
-    val dummyUsers = listOf(
-        User(1, "Ahmad Rizki", "ahmad", "ahmad@example.com"),
-        User(2, "Siti Nurhaliza", "siti", "siti@example.com"),
-        User(3, "Budi Santoso", "budi", "budi@example.com")
-    )
-    Column(modifier = Modifier.background(Color(0xFFF0F4F8))) {
-        LeaderboardContent(users = dummyUsers)
-    }
+    LeaderboardScreen()
 }

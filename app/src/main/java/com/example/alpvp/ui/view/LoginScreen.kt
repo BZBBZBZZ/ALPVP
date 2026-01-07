@@ -33,10 +33,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,      // Callback saat berhasil login
+    onNavigateToRegister: () -> Unit // Callback saat klik daftar
+) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -48,28 +52,15 @@ fun LoginScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(136.dp)) // Placeholder for the logo
-        Text(
-            text = "Selamat Datang!",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF333333)
-        )
-        Text(
-            text = "Masuk untuk melanjutkan quiz",
-            fontSize = 16.sp,
-            color = Color(0xFF666666)
-        )
+        // ... (Kode UI Logo dan Text Header Tetap Sama) ...
+        Spacer(modifier = Modifier.height(136.dp))
+        Text(text = "Selamat Datang!", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333))
+        Text(text = "Masuk untuk melanjutkan quiz", fontSize = 16.sp, color = Color(0xFF666666))
         Spacer(modifier = Modifier.height(32.dp))
-        Column (
-            modifier = Modifier
-                .padding(horizontal = 40.dp)
-        ){
-            Text(
-                text = "Username",
-                fontSize = 14.sp,
-                color = Color(0xFF666666)
-            )
+
+        // ... (Kode UI TextField Username & Password Tetap Sama) ...
+        Column(modifier = Modifier.padding(horizontal = 40.dp)) {
+            Text(text = "Username", fontSize = 14.sp, color = Color(0xFF666666))
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
@@ -86,17 +77,9 @@ fun LoginScreen() {
                 shape = RoundedCornerShape(12.dp)
             )
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-        Column (
-            modifier = Modifier
-                .padding(horizontal = 40.dp)
-        ){
-            Text(
-                text = "Password",
-                fontSize = 14.sp,
-                color = Color(0xFF666666)
-            )
+        Column(modifier = Modifier.padding(horizontal = 40.dp)) {
+            Text(text = "Password", fontSize = 14.sp, color = Color(0xFF666666))
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -105,7 +88,7 @@ fun LoginScreen() {
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
-                    IconButton(onClick = {passwordVisible = !passwordVisible}){
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Text(if (passwordVisible) "Hide" else "Show")
                     }
                 },
@@ -119,27 +102,27 @@ fun LoginScreen() {
                 shape = RoundedCornerShape(12.dp)
             )
         }
+
         Spacer(modifier = Modifier.height(32.dp))
+
+        // --- UPDATE PADA TOMBOL ---
         Button(
-            onClick = { /* Handle login */ },
+            onClick = {
+                // Disini logika validasi Login, jika sukses panggil:
+                onLoginSuccess()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
                 .height(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent
-            ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
                 text = "Masuk",
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(Color(0xFF8A2BE2), Color(0xFF4169E1))
-                        )
-                    )
+                    .background(brush = Brush.horizontalGradient(colors = listOf(Color(0xFF8A2BE2), Color(0xFF4169E1))))
                     .padding(12.dp),
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -147,18 +130,26 @@ fun LoginScreen() {
                 fontWeight = FontWeight.Bold
             )
         }
+
         Spacer(modifier = Modifier.height(24.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+
+        // --- UPDATE PADA TEKS DAFTAR ---
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Belum punya akun? ", fontSize = 14.sp, color = Color.Gray)
-            Text("Daftar sekarang", fontSize = 14.sp, color = Color(0xFF8A2BE2), fontWeight = FontWeight.Bold)
+            Text(
+                text = "Daftar sekarang",
+                fontSize = 14.sp,
+                color = Color(0xFF8A2BE2),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable { onNavigateToRegister() } // Tambahkan ini
+            )
         }
     }
 }
 
+// Update Preview agar tidak error (kosongkan lambda)
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen()
+    LoginScreen(onLoginSuccess = {}, onNavigateToRegister = {})
 }
