@@ -1,6 +1,5 @@
 package com.example.alpvp.ui.view
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,6 +17,9 @@ import androidx.navigation.NavController
 import com.example.alpvp.ui.uistate.QuizUiState
 import com.example.alpvp.ui.uistate.ResultUiState
 import com.example.alpvp.ui.viewmodel.QuizViewModel
+import androidx.compose.foundation.layout.WindowInsets // Import Wajib 1
+import androidx.compose.foundation.layout.statusBars // Import Wajib 2
+import androidx.compose.foundation.layout.windowInsetsPadding // Import Wajib 3
 
 @Composable
 fun QuizView(
@@ -26,8 +28,6 @@ fun QuizView(
 ) {
     val state = viewModel.quizState
     val resultState = viewModel.resultState
-
-
 
     // Cek jika result sudah sukses, pindah halaman
     androidx.compose.runtime.LaunchedEffect(resultState) {
@@ -42,6 +42,8 @@ fun QuizView(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F6FA)) // Background abu muda
+            // --- PERBAIKAN DI SINI (Supaya Timer tidak ketutup kamera) ---
+            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(16.dp)
     ) {
         when (state) {
@@ -111,6 +113,7 @@ fun QuizView(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Column {
                                     Text("Skor", fontSize = 10.sp, color = Color.Gray)
+                                    // Skor real-time belum ada di state, jadi sementara 0
                                     Text("0", fontWeight = FontWeight.Bold)
                                 }
                             }
@@ -144,12 +147,11 @@ fun QuizView(
 
                     // Options Buttons
                     val options = listOf(
-                        "A" to currentQ.option_a,
-                        "B" to currentQ.option_b,
-                        "C" to currentQ.option_c,
-                        "D" to currentQ.option_d
+                        "a" to currentQ.option_a,
+                        "b" to currentQ.option_b,
+                        "c" to currentQ.option_c,
+                        "d" to currentQ.option_d
                     )
-
                     options.forEach { (key, text) ->
                         Button(
                             onClick = { viewModel.answerQuestion(key) },

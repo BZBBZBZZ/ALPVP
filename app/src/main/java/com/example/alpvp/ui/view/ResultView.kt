@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alpvp.ui.uistate.ResultUiState
 import com.example.alpvp.ui.viewmodel.QuizViewModel
+import androidx.compose.foundation.layout.WindowInsets // Pastikan import ini ada
+import androidx.compose.foundation.layout.statusBars // Pastikan import ini ada
+import androidx.compose.foundation.layout.windowInsetsPadding // Pastikan import ini ada
 
 @Composable
 fun ResultView(
@@ -25,10 +28,13 @@ fun ResultView(
 ) {
     val state = viewModel.resultState
 
+    // --- PERBAIKAN DI SINI (BOX UTAMA) ---
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F6FA))
+            // Tambahkan baris ini agar konten turun melewati status bar/kamera
+            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(16.dp)
     ) {
         when (state) {
@@ -51,16 +57,17 @@ fun ResultView(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Header Judul
+                    // 1. HEADER
                     Text(
                         text = "Hasil Quiz",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // Ikon Medali
+                    // 2. MEDALI
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -70,24 +77,20 @@ fun ResultView(
                         Text(text = "🎖️", fontSize = 40.sp)
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Teks Motivasi
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Terus Berlatih! 💪",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // Kartu Total Skor
+                    // 3. KARTU SKOR
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
@@ -106,18 +109,16 @@ fun ResultView(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // List Pembahasan Soal
+                    // 4. LIST PEMBAHASAN
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
-                        // Tambahkan padding bawah agar item terakhir tidak tertutup tombol
-                        contentPadding = PaddingValues(bottom = 16.dp)
+                        contentPadding = PaddingValues(bottom = 10.dp)
                     ) {
-                        // Gunakan itemsIndexed untuk mendapatkan nomor soal
                         itemsIndexed(result.details ?: emptyList()) { index, detail ->
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -126,48 +127,50 @@ fun ResultView(
                                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    // 1. Nomor dan Teks Soal
-                                    // Menggunakan teks placeholder jika data dari backend belum ada
-                                    val questionText = detail.question_text ?: "(Soal tidak tersedia)"
+
+                                    // Nomor dan Teks Soal
+                                    val teksSoal = detail.question_text ?: "Soal No. ${index + 1}"
                                     Text(
-                                        text = "${index + 1}. $questionText",
+                                        text = "${index + 1}. $teksSoal",
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
+                                        fontSize = 14.sp
                                     )
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    // 2. Status Benar/Salah
+                                    // Status Benar/Salah
                                     Text(
-                                        text = if (detail.is_correct) "Benar" else "Salah",
+                                        text = if (detail.is_correct) "✅ Benar" else "❌ Salah",
                                         color = if (detail.is_correct) Color(0xFF4CAF50) else Color.Red,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
                                     )
 
-                                    // 3. Jawaban Benar
-                                    val correctAnswer = detail.correct_answer ?: "-"
-                                    Text(
-                                        text = "jawaban yang benar adalah ($correctAnswer)",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    // Jika Salah, Tampilkan Jawaban yang Benar
+                                    if (!detail.is_correct) {
+                                        Text(
+                                            text = "Jawaban yang benar adalah (${detail.correct_answer})",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color.DarkGray
+                                        )
+                                    }
 
                                     Spacer(modifier = Modifier.height(4.dp))
 
-                                    // 4. Penjelasan (Explanation)
-                                    val explanation = detail.explanation ?: "Tidak ada pembahasan."
+                                    // Explanation
                                     Text(
-                                        text = "($explanation)",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.Gray
+                                        text = "(${detail.explanation ?: "Tidak ada pembahasan"})",
+                                        fontSize = 12.sp,
+                                        color = Color.Gray,
+                                        lineHeight = 14.sp
                                     )
                                 }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Tombol Leaderboard (Hiasan)
+                    // 5. TOMBOL AKSI
                     Button(
                         onClick = { /* TODO */ },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE94057)),
@@ -177,7 +180,8 @@ fun ResultView(
                         Text("Leaderboard")
                     }
 
-                    // Tombol Kembali ke Beranda
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     OutlinedButton(
                         onClick = {
                             viewModel.resetNavigationFlag()
