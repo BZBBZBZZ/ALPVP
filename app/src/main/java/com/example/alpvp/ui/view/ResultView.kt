@@ -129,7 +129,7 @@ fun ResultView(
                                 Column(modifier = Modifier.padding(16.dp)) {
 
                                     // Nomor dan Teks Soal
-                                    val teksSoal = detail.question_text ?: "Soal No. ${index + 1}"
+                                    val teksSoal = detail.question_text ?: " "
                                     Text(
                                         text = "${index + 1}. $teksSoal",
                                         fontWeight = FontWeight.Bold,
