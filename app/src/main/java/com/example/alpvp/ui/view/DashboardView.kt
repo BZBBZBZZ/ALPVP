@@ -4,9 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,10 +17,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.alpvp.ui.viewmodel.AuthUiState
+import com.example.alpvp.ui.viewmodel.AuthViewModel
+import com.example.alpvp.ui.viewmodel.LeaderboardUiState
+import com.example.alpvp.ui.viewmodel.LeaderboardViewModel
 
 @Composable
-fun DashboardView(navController: NavController) {
+fun DashboardView(
+    navController: NavController,
+    authViewModel: AuthViewModel = viewModel(),
+    leaderboardViewModel: LeaderboardViewModel = viewModel()
+) {
+    val authState by authViewModel.authUiState.collectAsState()
+    val leaderboardState by leaderboardViewModel.leaderboardUiState.collectAsState()
+
+    val user = (authState as? AuthUiState.Success)?.user
+    val username = user?.username ?: "User"
+
+    val userRank = when (val lState = leaderboardState) {
+        is LeaderboardUiState.Success -> {
+            val rank = lState.users.indexOfFirst { it.user_id == user?.user_id }
+            if (rank != -1) (rank + 1).toString() else "-"
+        }
+        else -> "-"
+    }
+
     Scaffold(
         bottomBar = {
             NavigationBar(containerColor = Color.White) {
@@ -37,7 +63,7 @@ fun DashboardView(navController: NavController) {
                 )
                 // Tombol Materi (Arahkan ke file HomeView kamu yang lama)
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.List, contentDescription = "Materi") },
+                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Materi") },
                     label = { Text("Materi") },
                     selected = false,
                     onClick = { navController.navigate("materi") }
@@ -58,11 +84,11 @@ fun DashboardView(navController: NavController) {
                 .background(Color(0xFFF5F6FA))
                 .padding(paddingValues)
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.weight(0.5f))
             Text(
-                text = "👋 Hai, Dave!",
+                text = "👋 Hai, $username!",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF333333)
@@ -71,7 +97,7 @@ fun DashboardView(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Selamat datang di Healthy Quiz.\nSiap belajar hidup sehat hari ini?",
+                text = "Selamat datang di Healthy Quiz. Siap belajar hidup sehat hari ini?",
                 textAlign = TextAlign.Center,
                 color = Color.Gray,
                 fontSize = 16.sp
@@ -102,10 +128,45 @@ fun DashboardView(navController: NavController) {
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Icon(Icons.Default.List, contentDescription = null)
+                Icon(Icons.AutoMirrored.Filled.List, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Pelajari Materi Makanan", color = Color.Black)
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // New Info Cards
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                InfoCard(title = "Best Score", value = user?.high_score?.toString() ?: "-", icon = Icons.Default.EmojiEvents, modifier = Modifier.weight(1f))
+                InfoCard(title = "Current Leaderboard", value = userRank, icon = Icons.Default.Leaderboard, modifier = Modifier.weight(1f))
+            }
+            Spacer(modifier = Modifier.weight(1f))
+
+        }
+    }
+}
+
+@Composable
+fun InfoCard(title: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.height(120.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(imageVector = icon, contentDescription = title, tint = Color(0xFFB14AFF), modifier = Modifier.size(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = title, color = Color.Gray, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = value, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color(0xFF333333))
         }
     }
 }

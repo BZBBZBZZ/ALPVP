@@ -7,31 +7,50 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.alpvp.data.factory.ViewModelFactory
+import com.example.alpvp.data.container.AppContainer
 import com.example.alpvp.ui.view.*
 import com.example.alpvp.ui.viewmodel.*
 
 @Composable
 fun AppRouting() {
     val navController = rememberNavController()
+    val factory = ViewModelFactory(AppContainer())
 
+    // Inisialisasi ViewModel dengan factory untuk menyediakan dependensi
+    val authViewModel: AuthViewModel = viewModel(factory = factory)
+    val leaderboardViewModel: LeaderboardViewModel = viewModel(factory = factory)
+
+    // ViewModel tanpa dependensi dapat diinisialisasi seperti biasa
     val homeViewModel: HomeViewModel = viewModel()
     val detailViewModel: DetailViewModel = viewModel()
     val quizViewModel: QuizViewModel = viewModel()
 
-    // startDestination = "home" artinya aplikasi mulai di DashboardView
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = "login") {
 
-        // 1. ROUTE HOME (BERANDA) -> TAMPILKAN DASHBOARD VIEW
-        composable("home") {
-            DashboardView(navController = navController)
+        composable("login") {
+            LoginView(navController = navController, viewModel = authViewModel)
         }
 
-        // 2. ROUTE MATERI -> TAMPILKAN FILE HOMEVIEW (GRID MAKANAN)
+        composable("register") {
+            RegisterView(navController = navController, viewModel = authViewModel)
+        }
+
+        // Rute HOME (Dashboard) dengan ViewModel yang diperlukan
+        composable("home") {
+            DashboardView(
+                navController = navController,
+                authViewModel = authViewModel,
+                leaderboardViewModel = leaderboardViewModel
+            )
+        }
+
+        // Rute Materi
         composable("materi") {
             HomeView(viewModel = homeViewModel, navController = navController)
         }
 
-        // 3. ROUTE DETAIL
+        // Rute Detail
         composable(
             route = "detail/{foodId}",
             arguments = listOf(navArgument("foodId") { type = NavType.IntType })
@@ -44,19 +63,19 @@ fun AppRouting() {
             )
         }
 
-        // 4. ROUTE QUIZ
+        // Rute Quiz
         composable("Quiz") {
             QuizView(viewModel = quizViewModel, navController = navController)
         }
 
-        // 5. ROUTE RESULT
+        // Rute Result
         composable("Result") {
             ResultView(viewModel = quizViewModel, navController = navController)
         }
 
-        // 6. ROUTE LEADERBOARD
+        // Rute Leaderboard dengan ViewModel
         composable("leaderboard") {
-            LeaderboardView(navController = navController)
+            LeaderboardView(navController = navController, viewModel = leaderboardViewModel)
         }
     }
 }

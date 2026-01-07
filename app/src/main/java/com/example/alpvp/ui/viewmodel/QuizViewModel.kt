@@ -1,5 +1,6 @@
 package com.example.alpvp.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -51,22 +52,31 @@ class QuizViewModel : ViewModel() {
             quizState = QuizUiState.Loading
             try {
                 val response = repository.getAllQuestions()
-                if (response.isSuccessful && response.body() != null) {
-                    // === PERUBAHAN DISINI: Tambahkan .shuffled() ===
-                    // Agar setiap kali main, urutan soalnya beda
-                    val questions = response.body()!!.data.shuffled()
 
+                if (response.isSuccessful && response.body() != null) {
+                    // Log the success for confirmation
+                    Log.d("QuizViewModel", "Successfully loaded questions.")
+
+                    val questions = response.body()!!.data.shuffled()
                     quizState = QuizUiState.Success(questions = questions)
                     startTimer()
                 } else {
-                    val errorMsg = "Gagal: ${response.code()} - ${response.message()}"
+                    // --- FIX 1: LOG THE HTTP ERROR ---
+                    // This tells you if the server returned an error like 404 or 500.
+                    val errorMsg = "Failed to load questions. Code: ${response.code()}, Message: ${response.message()}"
+                    Log.e("QuizViewModel", errorMsg)
                     quizState = QuizUiState.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                quizState = QuizUiState.Error(e.message ?: "Unknown Error")
+                // --- FIX 2: LOG THE EXCEPTION ---
+                // This is the most important log. It catches network errors,
+                // parsing errors (like JSON mismatches), and other crashes.
+                Log.e("QuizViewModel", "An exception occurred in loadQuestions", e)
+                quizState = QuizUiState.Error(e.message ?: "An unknown error occurred")
             }
         }
     }
+
 
     private fun startTimer() {
         timerJob?.cancel()
@@ -91,6 +101,13 @@ class QuizViewModel : ViewModel() {
     fun answerQuestion(answer: String) {
         val currentState = quizState
         if (currentState is QuizUiState.Success) {
+            // --- ADD THIS SAFETY CHECK ---
+            // If the list of questions is empty, do nothing and exit the function.
+            if (currentState.questions.isEmpty()) {
+                return
+            }
+            // --- END OF SAFETY CHECK ---
+
             val currentQ = currentState.questions[currentState.currentQuestionIndex]
             currentState.userAnswers[currentQ.id] = answer
 
