@@ -152,7 +152,6 @@ fun QuizView(
                         "c" to currentQ.option_c,
                         "d" to currentQ.option_d
                     )
-
                     options.forEach { (key, text) ->
                         Button(
                             onClick = { viewModel.answerQuestion(key) },
