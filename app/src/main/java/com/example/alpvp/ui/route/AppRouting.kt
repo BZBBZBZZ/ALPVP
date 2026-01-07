@@ -7,17 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-
-// Import View
-import com.example.alpvp.ui.view.DetailView
-import com.example.alpvp.ui.view.HomeView
-import com.example.alpvp.ui.view.QuizView
-import com.example.alpvp.ui.view.ResultView // <--- PASTIKAN INI ADA (atau sesuaikan namanya)
-
-// Import ViewModel
-import com.example.alpvp.ui.viewmodel.DetailViewModel
-import com.example.alpvp.ui.viewmodel.HomeViewModel
-import com.example.alpvp.ui.viewmodel.QuizViewModel
+import com.example.alpvp.ui.view.*
+import com.example.alpvp.ui.viewmodel.*
 
 @Composable
 fun AppRouting() {
@@ -25,16 +16,22 @@ fun AppRouting() {
 
     val homeViewModel: HomeViewModel = viewModel()
     val detailViewModel: DetailViewModel = viewModel()
-    val quizViewModel: QuizViewModel = viewModel() // ViewModel ini dipakai bareng oleh Quiz dan Result
+    val quizViewModel: QuizViewModel = viewModel()
 
+    // startDestination = "home" artinya aplikasi mulai di DashboardView
     NavHost(navController = navController, startDestination = "home") {
 
-        // 1. Home
+        // 1. ROUTE HOME (BERANDA) -> TAMPILKAN DASHBOARD VIEW
         composable("home") {
+            DashboardView(navController = navController)
+        }
+
+        // 2. ROUTE MATERI -> TAMPILKAN FILE HOMEVIEW (GRID MAKANAN)
+        composable("materi") {
             HomeView(viewModel = homeViewModel, navController = navController)
         }
 
-        // 2. Detail
+        // 3. ROUTE DETAIL
         composable(
             route = "detail/{foodId}",
             arguments = listOf(navArgument("foodId") { type = NavType.IntType })
@@ -47,22 +44,19 @@ fun AppRouting() {
             )
         }
 
-        // 3. Quiz
+        // 4. ROUTE QUIZ
         composable("Quiz") {
-            QuizView(
-                viewModel = quizViewModel,
-                navController = navController
-            )
+            QuizView(viewModel = quizViewModel, navController = navController)
         }
 
-        // 4. Result (INI YANG TADI HILANG)
+        // 5. ROUTE RESULT
         composable("Result") {
-            // Kita oper viewModel yang sama biar skornya tampil
-            ResultView(
-                viewModel = quizViewModel,
-                navController = navController
-            )
+            ResultView(viewModel = quizViewModel, navController = navController)
         }
 
+        // 6. ROUTE LEADERBOARD
+        composable("leaderboard") {
+            LeaderboardView(navController = navController)
+        }
     }
 }

@@ -17,9 +17,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alpvp.ui.uistate.ResultUiState
 import com.example.alpvp.ui.viewmodel.QuizViewModel
-import androidx.compose.foundation.layout.WindowInsets // Pastikan import ini ada
-import androidx.compose.foundation.layout.statusBars // Pastikan import ini ada
-import androidx.compose.foundation.layout.windowInsetsPadding // Pastikan import ini ada
+// Import penting untuk status bar
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 
 @Composable
 fun ResultView(
@@ -28,13 +29,12 @@ fun ResultView(
 ) {
     val state = viewModel.resultState
 
-    // --- PERBAIKAN DI SINI (BOX UTAMA) ---
+    // Box Utama dengan padding status bar
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F6FA))
-            // Tambahkan baris ini agar konten turun melewati status bar/kamera
-            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.statusBars) // <-- PENTING: Biar gak ketabrak status bar
             .padding(16.dp)
     ) {
         when (state) {
@@ -67,7 +67,7 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 2. MEDALI
+                    // 2. MEDALI / IKON SKOR
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -86,7 +86,7 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 3. KARTU SKOR
+                    // 3. KARTU TOTAL SKOR
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(16.dp),
@@ -111,13 +111,13 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 4. LIST PEMBAHASAN
+                    // 4. LIST PEMBAHASAN SOAL
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = PaddingValues(bottom = 10.dp)
+                        contentPadding = PaddingValues(bottom = 20.dp)
                     ) {
                         itemsIndexed(result.details ?: emptyList()) { index, detail ->
                             Card(
@@ -128,51 +128,82 @@ fun ResultView(
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
 
-                                    // Nomor dan Teks Soal
-                                    val teksSoal = detail.question_text ?: " "
-                                    Text(
-                                        text = "${index + 1}. $teksSoal",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
-                                    )
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    // Status Benar/Salah
-                                    Text(
-                                        text = if (detail.is_correct) "✅ Benar" else "❌ Salah",
-                                        color = if (detail.is_correct) Color(0xFF4CAF50) else Color.Red,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
-                                    )
-
-                                    // Jika Salah, Tampilkan Jawaban yang Benar
-                                    if (!detail.is_correct) {
+                                    // --- NOMOR & TEKS SOAL ---
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        // Nomor (Index + 1)
                                         Text(
-                                            text = "Jawaban yang benar adalah (${detail.correct_answer})",
-                                            fontSize = 13.sp,
+                                            text = "${index + 1}. ",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 15.sp,
+                                            color = Color.Black
+                                        )
+
+                                        // Teks Soal
+                                        Text(
+                                            text = detail.question_text ?: "Memuat soal...",
                                             fontWeight = FontWeight.SemiBold,
-                                            color = Color.DarkGray
+                                            fontSize = 15.sp,
+                                            color = Color.Black,
+                                            lineHeight = 20.sp
                                         )
                                     }
 
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                                    Spacer(modifier = Modifier.height(8.dp))
 
-                                    // Explanation
+                                    // --- STATUS JAWABAN ---
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Jawabanmu: ", fontSize = 13.sp, color = Color.Gray)
+                                        Text(
+                                            text = detail.user_answer ?: "-",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (detail.is_correct) Color(0xFF4CAF50) else Color.Red
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = if (detail.is_correct) "✅" else "❌",
+                                            fontSize = 12.sp
+                                        )
+                                    }
+
+                                    // Jika Salah, Tampilkan Kunci
+                                    if (!detail.is_correct) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Kunci: ${detail.correct_answer}",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF4CAF50)
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // --- PEMBAHASAN ---
                                     Text(
-                                        text = "(${detail.explanation ?: "Tidak ada pembahasan"})",
+                                        text = "Pembahasan:",
                                         fontSize = 12.sp,
-                                        color = Color.Gray,
-                                        lineHeight = 14.sp
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Gray
+                                    )
+                                    Text(
+                                        text = detail.explanation ?: "Tidak ada pembahasan.",
+                                        fontSize = 13.sp,
+                                        color = Color.DarkGray,
+                                        lineHeight = 18.sp
                                     )
                                 }
                             }
                         }
                     }
 
-                    // 5. TOMBOL AKSI
+                    // 5. TOMBOL NAVIGASI BAWAH
                     Button(
-                        onClick = { /* TODO */ },
+                        onClick = { /* TODO: Arahkan ke Leaderboard nanti */ },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE94057)),
                         shape = RoundedCornerShape(50),
                         modifier = Modifier.fillMaxWidth()
@@ -185,9 +216,12 @@ fun ResultView(
                     OutlinedButton(
                         onClick = {
                             viewModel.resetNavigationFlag()
-                            navController.navigate("Quiz") {
-                                popUpTo("Result") { inclusive = true }
+                            // NAVIGASI KE HOME, BUKAN KE QUIZ
+                            navController.navigate("home") {
+                                // Hapus semua tumpukan history sampai halaman home
+                                popUpTo("home") { inclusive = true }
                             }
+                            // Opsional: Jika ingin refresh soal saat nanti main lagi
                             viewModel.loadQuestions()
                         },
                         shape = RoundedCornerShape(50),

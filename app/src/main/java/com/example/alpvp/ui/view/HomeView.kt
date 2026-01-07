@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,11 +25,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.alpvp.ui.uistate.HomeUIState
 import com.example.alpvp.ui.viewmodel.HomeViewModel
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
+
+// ... (Import tetap sama)
 @Composable
 fun HomeView(
     viewModel: HomeViewModel,
@@ -40,34 +39,39 @@ fun HomeView(
                 containerColor = Color.White,
                 tonalElevation = 8.dp
             ) {
+                // Tombol Home -> Ke DashboardView
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = false,
-                    onClick = { }
+                    onClick = { navController.navigate("home") }
                 )
+                // Tombol Quiz
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.PlayArrow, contentDescription = "Quiz") },
                     label = { Text("Quiz") },
                     selected = false,
-                    onClick = { navController.navigate("Quiz")}
+                    onClick = { navController.navigate("Quiz") }
                 )
+                // Tombol Materi (SEDANG AKTIF DI SINI)
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.List, contentDescription = "Materi") },
                     label = { Text("Materi") },
-                    selected = true,
+                    selected = true, // <-- Nyala karena ini halaman materi
                     onClick = { }
                 )
+                // Tombol Leaderboard
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Star, contentDescription = "Leaderboard") },
                     label = { Text("Leaderboard") },
                     selected = false,
-                    onClick = {  }
+                    onClick = { navController.navigate("leaderboard") }
                 )
-
             }
         }
     ) { paddingValues ->
+        // ... (Isi konten Grid Makanan JANGAN DIUBAH, biarkan kode lamamu di sini)
+        // Cukup copas body content dari kode HomeView lamamu
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,7 +79,8 @@ fun HomeView(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // header atas
+            // ... Header Materi & Grid Makanan ...
+            // (Gunakan kode lama untuk bagian Column ini)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,7 +103,7 @@ fun HomeView(
                 )
             }
 
-            // grid kard
+            // Grid Content
             when (state) {
                 is HomeUIState.Loading -> Box(
                     Modifier.fillMaxSize(),
@@ -128,12 +133,13 @@ fun HomeView(
                         }
                     }
                 }
-
                 else -> {}
             }
         }
     }
 }
+// Function FoodCard biarkan saja di bawah
+
 @Composable
 fun FoodCard(name: String, category: String, imageUrl: String, onClick: () -> Unit) {
     Card(
@@ -164,7 +170,6 @@ fun FoodCard(name: String, category: String, imageUrl: String, onClick: () -> Un
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // nama makanan
             Text(
                 text = name,
                 fontWeight = FontWeight.Medium,
@@ -175,7 +180,6 @@ fun FoodCard(name: String, category: String, imageUrl: String, onClick: () -> Un
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // kategori
             Text(
                 text = category,
                 fontSize = 14.sp,
@@ -185,7 +189,6 @@ fun FoodCard(name: String, category: String, imageUrl: String, onClick: () -> Un
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // tulisan detail
             Text(
                 text = "More Detail",
                 color = Color(0xFFAB47BC),
