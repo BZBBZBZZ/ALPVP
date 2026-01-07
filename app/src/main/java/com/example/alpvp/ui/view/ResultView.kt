@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alpvp.ui.uistate.ResultUiState
 import com.example.alpvp.ui.viewmodel.QuizViewModel
-// Import penting untuk status bar
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -29,12 +28,11 @@ fun ResultView(
 ) {
     val state = viewModel.resultState
 
-    // Box Utama dengan padding status bar
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F6FA))
-            .windowInsetsPadding(WindowInsets.statusBars) // <-- PENTING: Biar gak ketabrak status bar
+            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(16.dp)
     ) {
         when (state) {
@@ -67,7 +65,7 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 2. MEDALI / IKON SKOR
+                    // 2. MEDALI
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -86,7 +84,7 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 3. KARTU TOTAL SKOR
+                    // 3. KARTU SKOR
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(16.dp),
@@ -111,7 +109,7 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 4. LIST PEMBAHASAN SOAL
+                    // 4. LIST PEMBAHASAN
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
@@ -128,19 +126,17 @@ fun ResultView(
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
 
-                                    // --- NOMOR & TEKS SOAL ---
+                                    // Nomor dan Teks Soal
                                     Row(
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Start
                                     ) {
-                                        // Nomor (Index + 1)
                                         Text(
                                             text = "${index + 1}. ",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 15.sp,
                                             color = Color.Black
                                         )
-
-                                        // Teks Soal
                                         Text(
                                             text = detail.question_text ?: "Memuat soal...",
                                             fontWeight = FontWeight.SemiBold,
@@ -154,7 +150,7 @@ fun ResultView(
                                     HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    // --- STATUS JAWABAN ---
+                                    // Status Jawaban
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text("Jawabanmu: ", fontSize = 13.sp, color = Color.Gray)
                                         Text(
@@ -170,7 +166,7 @@ fun ResultView(
                                         )
                                     }
 
-                                    // Jika Salah, Tampilkan Kunci
+                                    // Kunci Jawaban (jika salah)
                                     if (!detail.is_correct) {
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
@@ -183,7 +179,7 @@ fun ResultView(
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    // --- PEMBAHASAN ---
+                                    // Pembahasan
                                     Text(
                                         text = "Pembahasan:",
                                         fontSize = 12.sp,
@@ -201,14 +197,15 @@ fun ResultView(
                         }
                     }
 
-                    // 5. TOMBOL NAVIGASI BAWAH
+                    // 5. TOMBOL NAVIGASI BAWAH (SUDAH DIPERBAIKI)
                     Button(
-                        onClick = { /* TODO: Arahkan ke Leaderboard nanti */ },
+                        // Navigasi ke halaman Leaderboard
+                        onClick = { navController.navigate("leaderboard") },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE94057)),
                         shape = RoundedCornerShape(50),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Leaderboard")
+                        Text("Lihat Leaderboard")
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -216,12 +213,9 @@ fun ResultView(
                     OutlinedButton(
                         onClick = {
                             viewModel.resetNavigationFlag()
-                            // NAVIGASI KE HOME, BUKAN KE QUIZ
                             navController.navigate("home") {
-                                // Hapus semua tumpukan history sampai halaman home
                                 popUpTo("home") { inclusive = true }
                             }
-                            // Opsional: Jika ingin refresh soal saat nanti main lagi
                             viewModel.loadQuestions()
                         },
                         shape = RoundedCornerShape(50),
