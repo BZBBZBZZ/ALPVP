@@ -5,9 +5,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,18 +30,19 @@ import com.example.alpvp.ui.viewmodel.ViewModelFactory
 
 @Composable
 fun LeaderboardScreen(
-    // In a real app, you would get the container from the Application class
-    // For now, we create it here for simplicity.
-    leaderboardViewModel: LeaderboardViewModel = viewModel(factory = ViewModelFactory(DefaultAppContainer()))
+    onNavigateToHome: () -> Unit = {},
+    leaderboardViewModel: LeaderboardViewModel? = null
 ) {
-    val uiState by leaderboardViewModel.uiState.collectAsStateWithLifecycle()
+    // Gunakan provided ViewModel atau create baru jika null (hanya untuk preview)
+    val viewModel = leaderboardViewModel ?: viewModel(factory = ViewModelFactory(DefaultAppContainer()))
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF0F4F8))
     ) {
-        // ... (Header Row remains the same)
+        // Header Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -50,21 +56,59 @@ fun LeaderboardScreen(
             }
         }
 
+        // Content Area
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            when (val state = uiState) {
+                is LeaderboardUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                is LeaderboardUiState.Success -> {
+                    LeaderboardContent(users = state.users)
+                }
+                is LeaderboardUiState.Error -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = "Failed to load leaderboard.", color = Color.Red)
+                    }
+                }
+            }
+        }
 
-        when (val state = uiState) {
-            is LeaderboardUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-            is LeaderboardUiState.Success -> {
-                LeaderboardContent(users = state.users)
-            }
-            is LeaderboardUiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Failed to load leaderboard.", color = Color.Red)
-                }
-            }
+        // Bottom Navigation Bar
+        NavigationBar(
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = Color.White,
+            contentColor = Color(0xFF4169E1)
+        ) {
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+                label = { Text("Home") },
+                selected = false,
+                onClick = { onNavigateToHome() },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color(0xFF4169E1),
+                    selectedTextColor = Color(0xFF4169E1),
+                    unselectedIconColor = Color.Gray,
+                    unselectedTextColor = Color.Gray
+                )
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.Star, contentDescription = "Leaderboard") },
+                label = { Text("Leaderboard") },
+                selected = true,
+                onClick = { },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color(0xFF4169E1),
+                    selectedTextColor = Color(0xFF4169E1),
+                    unselectedIconColor = Color.Gray,
+                    unselectedTextColor = Color.Gray
+                )
+            )
         }
     }
 }

@@ -13,10 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,7 +38,7 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onNavigateToLeaderboard: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,6 +60,7 @@ fun HomeScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .weight(1f)
                 .padding(horizontal = 16.dp)
         ) {
             Box(
@@ -108,6 +116,38 @@ fun HomeScreen() {
                 ScoreCard(title = "Current Leaderboard", score = "7777")
             }
         }
+
+        // Bottom Navigation Bar
+        NavigationBar(
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = Color.White,
+            contentColor = Color(0xFF4169E1)
+        ) {
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+                label = { Text("Home") },
+                selected = true,
+                onClick = { },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color(0xFF4169E1),
+                    selectedTextColor = Color(0xFF4169E1),
+                    unselectedIconColor = Color.Gray,
+                    unselectedTextColor = Color.Gray
+                )
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.Star, contentDescription = "Leaderboard") },
+                label = { Text("Leaderboard") },
+                selected = false,
+                onClick = { onNavigateToLeaderboard() },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color(0xFF4169E1),
+                    selectedTextColor = Color(0xFF4169E1),
+                    unselectedIconColor = Color.Gray,
+                    unselectedTextColor = Color.Gray
+                )
+            )
+        }
     }
 }
 
@@ -133,7 +173,7 @@ fun ScoreCard(title: String, score: String) {
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, heightDp = 800, widthDp = 400)
 @Composable
 fun HomeScreenPreview() {
     HomeScreen()
