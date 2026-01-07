@@ -1,5 +1,6 @@
 package com.example.alpvp.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alpvp.ui.model.User
@@ -8,11 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
+
+private const val TAG = "LeaderboardViewModel"
 
 sealed interface LeaderboardUiState {
     data class Success(val users: List<User>) : LeaderboardUiState
-    object Error : LeaderboardUiState
+    data class Error(val message: String) : LeaderboardUiState
     object Loading : LeaderboardUiState
 }
 
@@ -29,10 +31,20 @@ class LeaderboardViewModel(private val userRepository: UserRepository) : ViewMod
         viewModelScope.launch {
             _uiState.value = LeaderboardUiState.Loading
             _uiState.value = try {
-                LeaderboardUiState.Success(userRepository.getUsers())
-            } catch (e: IOException) {
-                // Tambahkan penanganan kesalahan lain jika perlu
-                LeaderboardUiState.Error
+                Log.d(TAG, "Fetching users from repository...")
+                val users = userRepository.getUsers()
+                Log.d(TAG, "Successfully fetched ${users.size} users")
+                // Sort users by score in descending order
+                val sortedUsers = users.sortedByDescending { it.score }
+                Log.d(TAG, "Leaderboard sorted by score (descending)")
+                LeaderboardUiState.Success(sortedUsers)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching users: ${e.message}", e)
+                Log.e(TAG, "Exception type: ${e.javaClass.simpleName}")
+                e.stackTrace.forEach {
+                    Log.e(TAG, "  at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})")
+                }
+                LeaderboardUiState.Error("Failed to load leaderboard: ${e.message}")
             }
         }
     }

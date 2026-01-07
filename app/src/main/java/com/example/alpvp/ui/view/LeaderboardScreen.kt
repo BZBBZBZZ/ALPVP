@@ -11,8 +11,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -72,8 +70,30 @@ fun LeaderboardScreen(
                     LeaderboardContent(users = state.users)
                 }
                 is LeaderboardUiState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "Failed to load leaderboard.", color = Color.Red)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Failed to load leaderboard",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.Red
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = state.message,
+                                fontSize = 12.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
@@ -157,20 +177,25 @@ fun LeaderboardCard(rank: Int, user: User) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                 Text(
                     text = "#$rank",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    modifier = Modifier.width(50.dp) // Adjusted width for rank
+                    modifier = Modifier.width(50.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(text = user.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    // Using username as a substitute for score as it's not in the User DTO
                     Text(text = "@${user.username}", fontSize = 14.sp, color = Color.Gray)
                 }
             }
+            Text(
+                text = user.score.toString(),
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Color(0xFF4169E1)
+            )
         }
     }
 }
