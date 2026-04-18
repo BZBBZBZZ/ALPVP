@@ -27,7 +27,6 @@ class QuizViewModel(private val repository: QuizRepository) : ViewModel() {
 
     var shouldNavigateToResult by mutableStateOf(false)
         private set
-    //hello testing
 
     private var timerJob: Job? = null
 
