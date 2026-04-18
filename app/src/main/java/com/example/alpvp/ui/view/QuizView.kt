@@ -26,12 +26,12 @@ fun QuizView(
     viewModel: QuizViewModel,
     navController: NavController
 ) {
-    val state = viewModel.quizState
+    val state = viewModel.quizUiState
     val resultState = viewModel.resultState
 
     // Cek jika result sudah sukses, pindah halaman
     androidx.compose.runtime.LaunchedEffect(resultState) {
-        if (resultState is ResultUiState.Success && !viewModel.hasNavigatedToResult) {
+        if (resultState is ResultUiState.Success && !viewModel.shouldNavigateToResult) {
             navController.navigate("Result") {
                 popUpTo("Quiz") { inclusive = true }
             }

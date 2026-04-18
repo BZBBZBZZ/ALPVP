@@ -112,10 +112,10 @@ fun ResultView(
                     // 4. LIST PEMBAHASAN
                     LazyColumn(
                         modifier = Modifier
-                            .weight(1f) // Mengambil sisa ruang yang tersedia
+                            .weight(1f)
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = PaddingValues(bottom = 10.dp)
+                        contentPadding = PaddingValues(bottom = 20.dp)
                     ) {
                         itemsIndexed(result.details ?: emptyList()) { index, detail ->
                             Card(
@@ -197,32 +197,9 @@ fun ResultView(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    // 5. TOMBOL NAVIGASI
 
-                    // 5. TOMBOL NAVIGASI BAWAH
-
-                    // --- [BARU] TOMBOL MAIN LAGI ---
-                    Button(
-                        onClick = {
-                            // Reset state dan timer di ViewModel
-                            viewModel.restartQuiz()
-
-                            // Navigasi kembali ke Quiz
-                            navController.navigate("Quiz") {
-                                // Pop Result agar kalau di-back dari Quiz tidak balik ke sini
-                                popUpTo("home") { inclusive = false }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // Warna Hijau
-                        shape = RoundedCornerShape(50),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Main Lagi 🔄")
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // --- TOMBOL LEADERBOARD ---
+                    // Tombol Leaderboard
                     Button(
                         onClick = { navController.navigate("leaderboard") },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE94057)),
@@ -234,15 +211,37 @@ fun ResultView(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // --- TOMBOL KEMBALI KE BERANDA ---
+                    // --- TOMBOL MAIN LAGI (SUDAH DIPERBAIKI) ---
+                    Button(
+                        onClick = {
+                            // 1. Reset state & Load soal baru DULUAN
+                            viewModel.resetNavigationFlag()
+                            viewModel.loadQuestions()
+
+                            // 2. Baru pindah ke Quiz
+                            navController.navigate("Quiz") {
+                                // popUpTo("home") inclusive = false artinya:
+                                // Hapus history Result, tapi biarkan Home tetap ada di bawah
+                                popUpTo("home") { inclusive = false }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
+                        shape = RoundedCornerShape(50),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("🔄 Main Quiz Lagi")
+                    }
+                    // ---------------------------------
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Tombol Home
                     OutlinedButton(
                         onClick = {
                             viewModel.resetNavigationFlag()
                             navController.navigate("home") {
                                 popUpTo("home") { inclusive = true }
                             }
-                            // Reset/Load ulang questions jika diperlukan untuk sesi berikutnya
-                            viewModel.loadQuestions()
                         },
                         shape = RoundedCornerShape(50),
                         modifier = Modifier.fillMaxWidth()
