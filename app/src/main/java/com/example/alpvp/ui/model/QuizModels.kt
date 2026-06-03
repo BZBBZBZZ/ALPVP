@@ -26,6 +26,7 @@ data class QuestionResponse(
 // 2. Model untuk POST Submit (Saat Kirim Jawaban)
 // ==========================================
 data class SubmitQuizRequest(
+    @SerializedName("username") val username: String? = null,
     @SerializedName("answers") val answers: List<UserAnswerRequest>
 )
 

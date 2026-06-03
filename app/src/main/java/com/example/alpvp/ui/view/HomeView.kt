@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.alpvp.ui.uistate.HomeUIState
 import com.example.alpvp.ui.viewmodel.HomeViewModel
+import androidx.compose.material.icons.filled.Person
 
 // ... (Import tetap sama)
 @Composable
@@ -39,36 +40,42 @@ fun HomeView(
                 containerColor = Color.White,
                 tonalElevation = 8.dp
             ) {
-                // Tombol Home -> Ke DashboardView
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = false,
                     onClick = { navController.navigate("home") }
                 )
-                // Tombol Quiz
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.PlayArrow, contentDescription = "Quiz") },
                     label = { Text("Quiz") },
                     selected = false,
                     onClick = { navController.navigate("Quiz") }
                 )
-                // Tombol Materi (SEDANG AKTIF DI SINI)
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.List, contentDescription = "Materi") },
                     label = { Text("Materi") },
-                    selected = true, // <-- Nyala karena ini halaman materi
+                    selected = true,
                     onClick = { }
                 )
-                // Tombol Leaderboard
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Star, contentDescription = "Leaderboard") },
-                    label = { Text("Leaderboard") },
+                    label = { Text("Top") },
                     selected = false,
                     onClick = { navController.navigate("leaderboard") }
                 )
+
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") },
+                    selected = false,
+                    onClick = { navController.navigate("profile") }
+                )
             }
-        }
+        },
     ) { paddingValues ->
         // ... (Isi konten Grid Makanan JANGAN DIUBAH, biarkan kode lamamu di sini)
         // Cukup copas body content dari kode HomeView lamamu

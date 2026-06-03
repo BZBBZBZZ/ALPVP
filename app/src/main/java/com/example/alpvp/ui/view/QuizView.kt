@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,10 +25,17 @@ import androidx.compose.foundation.layout.windowInsetsPadding // Import Wajib 3
 @Composable
 fun QuizView(
     viewModel: QuizViewModel,
-    navController: NavController
+    navController: NavController,
+    username: String? = null
 ) {
     val state = viewModel.quizState
     val resultState = viewModel.resultState
+    val isPlaying = viewModel.isPlaying
+    val hasQuestions = state is QuizUiState.Success && state.questions.isNotEmpty()
+
+    LaunchedEffect(username) {
+        viewModel.setCurrentUsername(username)
+    }
 
     // Cek jika result sudah sukses, pindah halaman
     androidx.compose.runtime.LaunchedEffect(resultState) {
@@ -46,10 +54,89 @@ fun QuizView(
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(16.dp)
     ) {
-        when (state) {
-            is QuizUiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-            is QuizUiState.Error -> Text("Error: ${state.message}", Modifier.align(Alignment.Center))
-            is QuizUiState.Success -> {
+        when {
+            state is QuizUiState.Error -> Text("Error: ${state.message}", Modifier.align(Alignment.Center))
+
+            !isPlaying -> {
+                Card(
+                    modifier = Modifier.align(Alignment.Center),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .widthIn(max = 320.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Siap Mulai Quiz?",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF333333)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Tekan tombol di bawah untuk mulai bermain. Kamu akan diberi waktu 10 detik tiap soal.",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            lineHeight = 20.sp,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Button(
+                            onClick = { if (hasQuestions) viewModel.startPlaying() },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
+                            enabled = hasQuestions
+                        ) {
+                            Text("Start Playing", fontWeight = FontWeight.Bold)
+                        }
+
+                        if (state is QuizUiState.Success && state.questions.isEmpty()) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Soal belum tersedia. Coba isi data quiz di backend dulu.",
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+
+                        if (state is QuizUiState.Loading) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+            }
+
+            state is QuizUiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+
+            state is QuizUiState.Success -> {
+                if (state.questions.isEmpty()) {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Soal kosong",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = Color.Red
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Data quiz belum ada di backend.",
+                            color = Color.Gray,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                    return
+                }
+
                 val currentQ = state.questions[state.currentQuestionIndex]
 
                 Column(

@@ -9,9 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,6 +37,10 @@ fun LeaderboardView(
     viewModel: LeaderboardViewModel = viewModel(factory = ViewModelFactory(AppContainer()))
 ) {
     val state by viewModel.leaderboardUiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchLeaderboard()
+    }
 
     Scaffold(
         bottomBar = {
@@ -63,9 +69,15 @@ fun LeaderboardView(
                 // Tombol Leaderboard
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Star, contentDescription = "Leaderboard") },
-                    label = { Text("Leaderboard") },
+                    label = { Text("Top") },
                     selected = true,
                     onClick = { }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") },
+                    selected = false,
+                    onClick = { navController.navigate("profile") }
                 )
             }
         }

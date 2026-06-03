@@ -33,7 +33,7 @@ fun DashboardView(
     val authState by authViewModel.authUiState.collectAsState()
     val leaderboardState by leaderboardViewModel.leaderboardUiState.collectAsState()
 
-    val user = (authState as? AuthUiState.Success)?.user
+    val user = authViewModel.currentUser ?: (authState as? AuthUiState.Success)?.user
     val username = user?.username ?: "User"
 
     val userRank = when (val lState = leaderboardState) {
@@ -71,9 +71,15 @@ fun DashboardView(
                 // Tombol Leaderboard
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Star, contentDescription = "Leaderboard") },
-                    label = { Text("Leaderboard") },
+                    label = { Text("Top") },
                     selected = false,
                     onClick = { navController.navigate("leaderboard") }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") },
+                    selected = false,
+                    onClick = { navController.navigate("profile") }
                 )
             }
         }
@@ -131,6 +137,20 @@ fun DashboardView(
                 Icon(Icons.AutoMirrored.Filled.List, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Pelajari Materi Makanan", color = Color.Black)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = { navController.navigate("profile") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(Icons.Default.Person, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Lihat Profil Saya", color = Color.Black)
             }
 
             Spacer(modifier = Modifier.height(24.dp))

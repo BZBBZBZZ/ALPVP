@@ -25,6 +25,7 @@ fun AppRouting() {
     val homeViewModel: HomeViewModel = viewModel()
     val detailViewModel: DetailViewModel = viewModel()
     val quizViewModel: QuizViewModel = viewModel()
+    val currentUsername = authViewModel.currentUser?.username
 
     NavHost(navController = navController, startDestination = "login") {
 
@@ -65,7 +66,11 @@ fun AppRouting() {
 
         // Rute Quiz
         composable("Quiz") {
-            QuizView(viewModel = quizViewModel, navController = navController)
+            QuizView(
+                viewModel = quizViewModel,
+                navController = navController,
+                username = currentUsername
+            )
         }
 
         // Rute Result
@@ -76,6 +81,15 @@ fun AppRouting() {
         // Rute Leaderboard dengan ViewModel
         composable("leaderboard") {
             LeaderboardView(navController = navController, viewModel = leaderboardViewModel)
+        }
+
+        // Rute Profile
+        composable("profile") {
+            ProfileView(
+                navController = navController,
+                authViewModel = authViewModel,
+                leaderboardViewModel = leaderboardViewModel
+            )
         }
     }
 }

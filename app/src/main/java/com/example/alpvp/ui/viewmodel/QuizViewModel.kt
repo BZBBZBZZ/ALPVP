@@ -25,6 +25,10 @@ class QuizViewModel : ViewModel() {
         private set
 
     var hasNavigatedToResult = false
+    var isPlaying by mutableStateOf(false)
+        private set
+
+    private var currentUsername: String? = null
 
     private var timerJob: Job? = null
 
@@ -40,11 +44,26 @@ class QuizViewModel : ViewModel() {
         // 2. Reset navigasi flag
         hasNavigatedToResult = false
 
-        // 3. Reset result state ke Loading (supaya tidak otomatis pindah ke ResultView lagi)
+        // 3. Reset start state supaya balik ke tombol Start Playing
+        isPlaying = false
+
+        // 4. Reset result state ke Loading (supaya tidak otomatis pindah ke ResultView lagi)
         resultState = ResultUiState.Loading
 
-        // 4. Muat ulang soal (ini akan otomatis mengacak soal karena logika di loadQuestions)
+        // 5. Muat ulang soal (ini akan otomatis mengacak soal karena logika di loadQuestions)
         loadQuestions()
+    }
+
+    fun startPlaying() {
+        isPlaying = true
+        val currentState = quizState
+        if (currentState is QuizUiState.Success) {
+            startTimer()
+        }
+    }
+
+    fun setCurrentUsername(username: String?) {
+        currentUsername = username?.takeIf { it.isNotBlank() }
     }
 
     fun loadQuestions() {
@@ -59,7 +78,9 @@ class QuizViewModel : ViewModel() {
 
                     val questions = response.body()!!.data.shuffled()
                     quizState = QuizUiState.Success(questions = questions)
-                    startTimer()
+                    if (isPlaying) {
+                        startTimer()
+                    }
                 } else {
                     // --- FIX 1: LOG THE HTTP ERROR ---
                     // This tells you if the server returned an error like 404 or 500.
@@ -134,7 +155,10 @@ class QuizViewModel : ViewModel() {
             val answerList = finalState.userAnswers.map {
                 UserAnswerRequest(it.key, it.value)
             }
-            val request = SubmitQuizRequest(answerList)
+            val request = SubmitQuizRequest(
+                username = currentUsername,
+                answers = answerList
+            )
 
             try {
                 val response = repository.submitQuiz(request)
